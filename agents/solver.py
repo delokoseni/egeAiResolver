@@ -40,13 +40,12 @@ class Solver:
 
         # Дополнительная проверка спецификации
         if (
-            specification.task_type != "pair_sequence_analysis"
-            or specification.element_condition
-            != "exactly_one_positive_two_digit_number"
-            or specification.pair_condition
-            != "sum_divisible_by_minimum_positive_two_digit_number"
-            or set(specification.required_outputs)
-            != {"pair_count", "maximum_pair_sum"}
+                specification.task_type != "pair_sequence_analysis"
+                or specification.pair_definition == "unsupported"
+                or specification.element_condition == "unsupported"
+                or specification.pair_condition == "unsupported"
+                or set(specification.required_outputs)
+                != {"pair_count", "maximum_pair_sum"}
         ):
             raise ValueError(
                 "Спецификация не соответствует поддерживаемому формату"
@@ -75,7 +74,7 @@ class Solver:
         solver_result = self.structured_llm.invoke(messages)
 
         # Выполняем реальные вычисления обычным Python
-        calculation = solve_sequence(numbers)
+        calculation = solve_sequence(numbers, specification)
 
         return {
             "algorithm_description": solver_result.algorithm_description,

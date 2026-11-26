@@ -1,42 +1,92 @@
+
 from itertools import combinations
 
-def verify_sequence(numbers: list[int]) -> dict:
+
+def verify_sequence(numbers: list[int], specification) -> dict:
     if not numbers:
         raise ValueError("Последовательность пустая")
 
-    positive_two_digit = [
-        number for number in numbers
-        if 10 <= number <= 99
-    ]
+    # Независимо определяем делитель
+    if (
+        specification.pair_condition
+        == "sum_divisible_by_minimum_positive_two_digit_number"
+    ):
+        candidates = [
+            value for value in numbers
+            if 10 <= value <= 99
+        ]
 
-    if not positive_two_digit:
-        raise ValueError(
-            "В последовательности нет положительных двузначных чисел"
-        )
+    elif (
+        specification.pair_condition
+        == "absolute_difference_divisible_by_minimum_positive_multiple_of_35"
+    ):
+        candidates = [
+            value for value in numbers
+            if value > 0 and value % 35 == 0
+        ]
 
-    minimum_two_digit = min(positive_two_digit)
+    else:
+        raise ValueError("Неизвестное условие для пары")
 
-    valid_pairs = []
+    if not candidates:
+        raise ValueError("Не найдено число для определения делителя")
 
+    divisor = min(candidates)
+
+    valid_sums = []
+
+    # Проверяем пары независимо от основного решателя
     for (i, first), (j, second) in combinations(
         enumerate(numbers), 2
     ):
-        if j - i < 2:
-            continue
+        if specification.pair_definition == "adjacent":
+            if j != i + 1:
+                continue
 
-        first_is_two_digit = 10 <= first <= 99
-        second_is_two_digit = 10 <= second <= 99
+        elif specification.pair_definition == "non_adjacent_distance_at_least_2":
+            if j - i < 2:
+                continue
 
-        if first_is_two_digit == second_is_two_digit:
-            continue
+        else:
+            raise ValueError("Неизвестное определение пары")
 
-        pair_sum = first + second
+        # Проверяем условие на элементы
+        if (
+            specification.element_condition
+            == "exactly_one_positive_two_digit_number"
+        ):
+            first_is_two_digit = 10 <= first <= 99
+            second_is_two_digit = 10 <= second <= 99
 
-        if pair_sum % minimum_two_digit == 0:
-            valid_pairs.append(pair_sum)
+            if first_is_two_digit == second_is_two_digit:
+                continue
+
+        elif specification.element_condition == "elements_are_not_equal":
+            if first == second:
+                continue
+
+        else:
+            raise ValueError("Неизвестное условие на элементы")
+
+        # Проверяем условие на пару
+        if (
+            specification.pair_condition
+            == "sum_divisible_by_minimum_positive_two_digit_number"
+        ):
+            if (first + second) % divisor != 0:
+                continue
+
+        elif (
+            specification.pair_condition
+            == "absolute_difference_divisible_by_minimum_positive_multiple_of_35"
+        ):
+            if abs(first - second) % divisor != 0:
+                continue
+
+        valid_sums.append(first + second)
 
     return {
-        "minimum_two_digit": minimum_two_digit,
-        "pair_count": len(valid_pairs),
-        "maximum_pair_sum": max(valid_pairs) if valid_pairs else None
+        "divisor": divisor,
+        "pair_count": len(valid_sums),
+        "maximum_pair_sum": max(valid_sums) if valid_sums else 0
     }

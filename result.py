@@ -1,74 +1,36 @@
-
-import sys
-
 def solve():
-    # ---------- 1. Чтение чисел из файла 17.txt ----------
-    try:
-        with open('examples/17.txt', 'r') as f:
-            raw = f.read().strip()
-            # разделение по пробелам или переносам строки
-            tokens = raw.split()
-            arr = []
-            for tok in tokens:
-                # пытаемся преобразовать в целое число
-                try:
-                    arr.append(int(tok))
-                except ValueError:
-                    # если токен не является целым числом, пропускаем
-                    pass
-    except FileNotFoundError:
-        # если файл отсутствует, считаем, что последовательность пуста
-        arr = []
+    # 1. Чтение данных
+    with open('C:/Users/Артур/Downloads/17_22471.txt', 'r') as f:
+        data = [int(line.strip()) for line in f if line.strip()]
 
-    n = len(arr)
+    # 2. Поиск минимального положительного элемента, кратного 35
+    divisor = min(x for x in data if x > 0 and x % 35 == 0)
 
-    # ---------- 2. Находим минимальное положительное двузначное число ----------
-    min_pos_two_digit = None  # None означает «нет таких чисел»
-    for val in arr:
-        if isinstance(val, int) and 10 <= val <= 99:
-            if min_pos_two_digit is None or val < min_pos_two_digit:
-                min_pos_two_digit = val
+    count = 0
+    max_sum = -float('inf')
 
-    # ---------- 3. Перебор пар (i, j) с j - i >= 2 ----------
-    pair_count = 0      # количество подходящих пар
-    max_pair_sum = None  # максимальная сумма среди подходящих пар
+    # 3. Перебор соседних пар
+    for i in range(len(data) - 1):
+        a = data[i]
+        b = data[i + 1]
 
-    for i in range(n):
-        for j in range(i + 2, n):  # j - i >= 2
-            a = arr[i]
-            b = arr[j]
+        # Условие: элементы не равны
+        if a == b:
+            continue
 
-            # подсчёт, сколько из элементов является положительным двузначным
-            cnt_pd = 0
-            if 10 <= a <= 99:
-                cnt_pd += 1
-            if 10 <= b <= 99:
-                cnt_pd += 1
+        # Условие: |a - b| делится на divisor
+        if abs(a - b) % divisor == 0:
+            count += 1
+            pair_sum = a + b
+            if pair_sum > max_sum:
+                max_sum = pair_sum
 
-            # ровно один элемент должен быть двузначным положительным
-            if cnt_pd != 1:
-                continue
+    # 4. Обработка случая, когда пар нет
+    if count == 0:
+        max_sum = 0
 
-            # проверка делимости суммы на минимальное двузначное число
-            if min_pos_two_digit is not None:
-                s = a + b
-                if s % min_pos_two_digit != 0:
-                    continue
-
-            # пара удовлетворяет всем условиям
-            pair_count += 1
-            s = a + b
-            if max_pair_sum is None or s > max_pair_sum:
-                max_pair_sum = s
-
-    # ---------- 4. Вывод результатов ----------
-    if pair_count == 0:
-        print("Количество подходящих пар: 0")
-        print("Максимальная сумма: 0")
-    else:
-        print(f"Количество подходящих пар: {pair_count}")
-        print(f"Максимальная сумма: {max_pair_sum}")
+    print(count, max_sum)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     solve()

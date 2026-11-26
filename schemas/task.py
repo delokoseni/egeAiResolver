@@ -1,3 +1,4 @@
+
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -15,13 +16,17 @@ class TaskSpecification(BaseModel):
         description="Тип задачи"
     )
 
-    pair_definition: str = Field(
-        default="",
-        description="Определение пары элементов. Если задача не поддерживается, пустая строка"
+    pair_definition: Literal[
+        "adjacent",
+        "non_adjacent_distance_at_least_2",
+        "unsupported"
+    ] = Field(
+        description="Какие пары рассматриваются: соседние или несоседние"
     )
 
     element_condition: Literal[
         "exactly_one_positive_two_digit_number",
+        "elements_are_not_equal",
         "unsupported"
     ] = Field(
         description="Условие на отдельные элементы пары"
@@ -29,9 +34,10 @@ class TaskSpecification(BaseModel):
 
     pair_condition: Literal[
         "sum_divisible_by_minimum_positive_two_digit_number",
+        "absolute_difference_divisible_by_minimum_positive_multiple_of_35",
         "unsupported"
     ] = Field(
-        description="Условие, которому должна удовлетворять пара"
+        description="Математическое условие на пару"
     )
 
     required_outputs: list[

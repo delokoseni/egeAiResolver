@@ -29,7 +29,7 @@ class Reviewer:
         numbers = load_sequence(file_path)
 
         # Независимо пересчитываем результат
-        verified_calculation = verify_sequence(numbers)
+        verified_calculation = verify_sequence(numbers, specification)
 
         # Сравниваем вычисления Solver и Reviewer
         solver_calculation = solver_result["calculation"]
