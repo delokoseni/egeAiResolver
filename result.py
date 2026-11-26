@@ -1,36 +1,42 @@
-def solve():
-    # 1. Чтение данных
-    with open('C:/Users/Артур/Downloads/17_22471.txt', 'r') as f:
-        data = [int(line.strip()) for line in f if line.strip()]
+def is_positive_two_digit(x):
+    return 10 <= x <= 99
 
-    # 2. Поиск минимального положительного элемента, кратного 35
-    divisor = min(x for x in data if x > 0 and x % 35 == 0)
+
+with open('examples/17.txt', 'r') as f:
+    nums = [int(x) for x in f.read().split()]
+
+# Минимальное положительное двузначное число последовательности
+two_digit_numbers = [x for x in nums if is_positive_two_digit(x)]
+
+if not two_digit_numbers:
+    # Если положительных двузначных чисел нет, условие делимости невыполнимо
+    print(0)
+    print(0)
+else:
+    divisor = min(two_digit_numbers)
 
     count = 0
-    max_sum = -float('inf')
+    max_sum = None
+    n = len(nums)
 
-    # 3. Перебор соседних пар
-    for i in range(len(data) - 1):
-        a = data[i]
-        b = data[i + 1]
+    # Пары на расстоянии не менее двух позиций: j - i >= 2
+    for i in range(n):
+        for j in range(i + 2, n):
+            a = nums[i]
+            b = nums[j]
 
-        # Условие: элементы не равны
-        if a == b:
-            continue
+            # Ровно один элемент пары — положительное двузначное число
+            if is_positive_two_digit(a) != is_positive_two_digit(b):
+                pair_sum = a + b
 
-        # Условие: |a - b| делится на divisor
-        if abs(a - b) % divisor == 0:
-            count += 1
-            pair_sum = a + b
-            if pair_sum > max_sum:
-                max_sum = pair_sum
+                # Сумма должна делиться без остатка на divisor
+                if pair_sum % divisor == 0:
+                    count += 1
+                    if max_sum is None or pair_sum > max_sum:
+                        max_sum = pair_sum
 
-    # 4. Обработка случая, когда пар нет
-    if count == 0:
+    if max_sum is None:
         max_sum = 0
 
-    print(count, max_sum)
-
-
-if __name__ == '__main__':
-    solve()
+    print(count)
+    print(max_sum)
